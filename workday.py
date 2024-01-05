@@ -7,6 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import re
+import os
 from myInfo import secrets, experiences, schoolInfo, skills
 
 
@@ -179,6 +180,12 @@ addWorkExperience(experiences)
 addEducation(schoolInfo)
 
 addSkills(skills)
+
+# uploading resume based on Selenium source code
+file_name = "RESUME-dmorales024.pdf"
+upload_file = os.path.abspath(os.path.join(os.path.dirname(__file__), file_name))
+file_input = driver.find_element(By.CSS_SELECTOR, "input[type='file']")
+file_input.send_keys(upload_file)
 
 nextButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[5]/div/ul/div[3]/div/div/button')
 nextButton.click()
