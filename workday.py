@@ -6,6 +6,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
+import re
 from myInfo import secrets, experiences
 
 
@@ -29,6 +30,7 @@ def waitForLoad(xpath):
 def typeIntoBox(xpath, value):
     element = driver.find_element(By.XPATH, xpath)
     element.send_keys(value)
+    time.sleep(0.5)
 
 def selectFromDropdown(xpath, n):
     dropdown = driver.find_element(By.XPATH,xpath)
@@ -48,9 +50,11 @@ def addWorkExperience(details):
     i = 1
     for experience_key, experience_details in details.items():
         addExperienceButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
+        driver.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'nearest'});", addExperienceButton)
         addExperienceButton.click()
         time.sleep(2)
-        experience_number = int(experience_key[-1])
+        number_part = re.search(r'\d+', experience_key).group()  # Extracts all consecutive digits
+        experience_number = int(number_part)
         input_index = (experience_number-1) *3 + 1
         typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', experience_details['job_title'])
         typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index + 1}]', experience_details['company'])
@@ -58,6 +62,8 @@ def addWorkExperience(details):
 
         if (experience_details['currently_working_here']):
             currentlyWorkHereBox = driver.find_element(By.XPATH, f'(//*[@class="css-1rmmx2s"])[{experience_number}]')
+            driver.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'nearest'});", currentlyWorkHereBox)
+
             currentlyWorkHereBox.click()
             # time.sleep(20)
             typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['start_month'])
@@ -83,8 +89,6 @@ time.sleep(0.1)
 
 #pressing the signin button on the workday page
 signin = driver.find_element(By.XPATH,'//*[@id="wd-Authentication-NO_METADATA_ID-uid6"]/div/div[1]/div/form/div[3]/div/div/div/div/div')
-signin.click()
-time.sleep(0.25)
 signin.click()
 
 # signin.send_keys(Keys.ENTER)
