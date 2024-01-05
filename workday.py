@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import re
-from myInfo import secrets, experiences
+from myInfo import secrets, experiences, schoolInfo
 
 
 driver = webdriver.Chrome()
@@ -46,6 +46,24 @@ def selectFromDropdown(xpath, n):
     actions.send_keys(Keys.ENTER)
     actions.perform()
 
+
+def specialInputBox(xpath, specialNum, value):
+    actions = ActionChains(driver)
+    typeIntoBox(f'{xpath}[{specialNum}]', value)
+    actions.send_keys(Keys.ENTER)
+    actions.perform()
+    x = 1
+    time.sleep(1)
+    while(driver.find_element(By.XPATH, f'(//*[@class="css-veag3t"])[{specialNum}]').text != value):
+        #create action chain to automate arrow down to select appropriate dropdown option
+        actions = actions.send_keys(Keys.ARROW_DOWN)
+        actions.perform()
+        time.sleep(0.5)
+        x+=1
+    actions.send_keys(Keys.ENTER)
+    actions.perform()
+    time.sleep(0.5)
+
 def addWorkExperience(details):
     i = 1
     for experience_key, experience_details in details.items():
@@ -81,6 +99,32 @@ def addWorkExperience(details):
             i+=1
         typeIntoBox(f'(//textarea[@class="css-z4c8uq"])[{experience_number}]',experience_details['role_description'])
 
+def addEducation(schoolInfo):
+    addEducationButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[3]/div[2]/div[3]/div/div/div/button')
+    driver.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'nearest'});", addEducationButton)
+    addEducationButton.click()
+
+    time.sleep(2)
+    #--------TODO: change back to original input_index --------#
+    # input_index = len(experiences) * 3 + 1
+    input_index = 1
+    i = 1
+    typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['schoolName'])
+    input_index += 1
+    while (driver.find_element(By.XPATH, f'(//*[@class="css-12zup1l"])[1]').text.find('Bachelor') == -1) :
+        selectFromDropdown(f'(//*[@class="css-12zup1l"])[1]', 1)
+        time.sleep(0.5)
+
+
+    specialInputBox('(//*[@placeholder="Search"])', 1, schoolInfo['fieldOfStudy'])
+    typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['GPA'])
+    # typeIntoBox(f'(//input[@class="css-72im0m"])[{41}]', schoolInfo['startYear'])
+    # typeIntoBox(f'(//input[@class="css-72im0m"])[{42}]', schoolInfo['endYear'])
+    typeIntoBox(f'(//input[@class="css-72im0m"])[{1}]', schoolInfo['startYear'])
+    typeIntoBox(f'(//input[@class="css-72im0m"])[{2}]', schoolInfo['endYear'])
+
+
+
 waitForLoad('//*[@id="input-4"]')
 #accessing username and password html elements
 typeIntoBox('//*[@id="input-4"]', secrets['username'])
@@ -97,8 +141,8 @@ signin.click()
 
 #----------- MY INFORMATION -------------#
 waitForLoad('//*[@id="input-1"]')
-# while (driver.find_element(By.XPATH, '//*[@id="input-1"]').text != 'Other'):
-#     selectFromDropdown('//*[@id="input-1"]', 1)
+# while (driver.find_element(By.XPATH, '//*[@id="input-1"]').text != 'Agency'):
+#     selectFromDropdown('(//*[@class="css-12zup1l"])[1]', 1)
 #     time.sleep(0.5)
 
 
@@ -127,7 +171,13 @@ nextButton.click()
 
 #------------ MY EXPERIENCE ---------------#
 waitForLoad('//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
-addWorkExperience(experiences)
+
+# work experiences
+# addWorkExperience(experiences)
+
+# education
+addEducation(schoolInfo)
+
 
 
 time.sleep(100)
