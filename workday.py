@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
 import re
-from myInfo import secrets, experiences, schoolInfo
+from myInfo import secrets, experiences, schoolInfo, skills
 
 
 driver = webdriver.Chrome()
@@ -53,8 +53,8 @@ def specialInputBox(xpath, specialNum, value):
     actions.send_keys(Keys.ENTER)
     actions.perform()
     x = 1
-    time.sleep(1)
-    while(driver.find_element(By.XPATH, f'(//*[@class="css-veag3t"])[{specialNum}]').text != value):
+    time.sleep(2.5)
+    while(driver.find_element(By.XPATH, f'(//*[@class="css-veag3t"])[{x}]').text != value):
         #create action chain to automate arrow down to select appropriate dropdown option
         actions = actions.send_keys(Keys.ARROW_DOWN)
         actions.perform()
@@ -105,9 +105,7 @@ def addEducation(schoolInfo):
     addEducationButton.click()
 
     time.sleep(2)
-    #--------TODO: change back to original input_index --------#
-    # input_index = len(experiences) * 3 + 1
-    input_index = 1
+    input_index = len(experiences) * 3 + 1
     i = 1
     typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['schoolName'])
     input_index += 1
@@ -118,11 +116,13 @@ def addEducation(schoolInfo):
 
     specialInputBox('(//*[@placeholder="Search"])', 1, schoolInfo['fieldOfStudy'])
     typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['GPA'])
-    # typeIntoBox(f'(//input[@class="css-72im0m"])[{41}]', schoolInfo['startYear'])
-    # typeIntoBox(f'(//input[@class="css-72im0m"])[{42}]', schoolInfo['endYear'])
-    typeIntoBox(f'(//input[@class="css-72im0m"])[{1}]', schoolInfo['startYear'])
-    typeIntoBox(f'(//input[@class="css-72im0m"])[{2}]', schoolInfo['endYear'])
+    typeIntoBox(f'(//input[@class="css-72im0m"])[{39}]', schoolInfo['startYear'])
+    typeIntoBox(f'(//input[@class="css-72im0m"])[{40}]', schoolInfo['endYear'])
 
+
+def addSkills(skills):
+    for skill in skills:
+        specialInputBox('(//*[@placeholder="Search"])', 2, skill)
 
 
 waitForLoad('//*[@id="input-4"]')
@@ -173,10 +173,15 @@ nextButton.click()
 waitForLoad('//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
 
 # work experiences
-# addWorkExperience(experiences)
+addWorkExperience(experiences)
 
 # education
 addEducation(schoolInfo)
+
+addSkills(skills)
+
+nextButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[5]/div/ul/div[3]/div/div/button')
+nextButton.click()
 
 
 
