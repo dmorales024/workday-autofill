@@ -6,7 +6,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 import time
-from myInfo import secrets
+from myInfo import secrets, experiences
 
 
 driver = webdriver.Chrome()
@@ -43,6 +43,37 @@ def selectFromDropdown(xpath, n):
         time.sleep(0.01)
     actions.send_keys(Keys.ENTER)
     actions.perform()
+
+def addWorkExperience(details):
+    i = 1
+    for experience_key, experience_details in details.items():
+        addExperienceButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
+        addExperienceButton.click()
+        time.sleep(2)
+        experience_number = int(experience_key[-1])
+        input_index = (experience_number-1) *3 + 1
+        typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', experience_details['job_title'])
+        typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index + 1}]', experience_details['company'])
+        typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index + 2}]', experience_details['location'])
+
+        if (experience_details['currently_working_here']):
+            currentlyWorkHereBox = driver.find_element(By.XPATH, f'(//*[@class="css-1rmmx2s"])[{experience_number}]')
+            currentlyWorkHereBox.click()
+            # time.sleep(20)
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['start_month'])
+            i+=1
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['start_year'])
+            i+=1
+        else:
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['start_month'])
+            i+=1
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['start_year'])
+            i+=1
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['end_month'])
+            i+=1
+            typeIntoBox(f'(//input[@class="css-72im0m"])[{i}]', experience_details['end_year'])
+            i+=1
+        typeIntoBox(f'(//textarea[@class="css-z4c8uq"])[{experience_number}]',experience_details['role_description'])
 
 waitForLoad('//*[@id="input-4"]')
 #accessing username and password html elements
@@ -92,50 +123,7 @@ nextButton.click()
 
 #------------ MY EXPERIENCE ---------------#
 waitForLoad('//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
-addExperienceButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
-addExperienceButton.click()
-time.sleep(2)
-
-typeIntoBox('//*[@id="input-19"]', 'Software Engineering Intern')
-typeIntoBox('//*[@id="input-20"]', 'The Walt Disney Company')
-currentlyWorkHereBox = driver.find_element(By.XPATH, '//*[@id="input-21"]')
-currentlyWorkHereBox.click()
-# time.sleep(20)
-typeIntoBox('//*[@id="input-24-dateSectionMonth-input"]', '05')
-typeIntoBox('//*[@id="input-24-dateSectionYear-input"]', '2023')
-typeIntoBox('//*[@id="input-28"]', "Designing a new website in Angular to replace the outdated Microsoft Sharepoint website for the Minnie Van Team. "
-"The new site serves as a platform for managing Minnie Van Cast Members, scheduling Minnie Van Rides for Guests, and managing PII from Guests. "
-"Assisted with the development of RESTful services in Java for SQL databases containing Minnie Van and Cast Member information.")
-
-
-#click 'Add Another' button
-addExperienceButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[3]/div[2]/div[1]/div/div/div/button')
-addExperienceButton.click()
-time.sleep(2)
-#job title
-typeIntoBox('(//input[@class="css-ilrio6"])[4]', 'Software Engineering Intern')
-#company
-typeIntoBox('(//input[@class="css-ilrio6"])[5]', 'The Walt Disney Company')
-#currently work here?
-# currentlyWorkHereBox = driver.find_element(By.XPATH, '//*[@id="input-50"]')
-# currentlyWorkHereBox.click()
-# time.sleep(20)
-#startdate
-typeIntoBox('(//input[@class="css-72im0m"])[3]', '05')
-typeIntoBox('(//input[@class="css-72im0m"])[4]', '2022')
-
-#end date
-typeIntoBox('(//input[@class="css-72im0m"])[5]', '08')
-typeIntoBox('(//input[@class="css-72im0m"])[6]', '2022')
-
-#role description
-typeIntoBox('(//textarea[@class="css-z4c8uq"])[2]', "Created a proof of concept app leveraging Flutter to build iOS native and web applications to integrate various Ticketing functionalities for the Entitlement team. "
-"Cooperated on forming a GitHub Build Action Pipeline for all future Flutter apps in the company with AppCenter. "
-"Integrated various widgets and RESTful services to highlight Flutter's capabilities.")
-
-
-
-
+addWorkExperience(experiences)
 
 
 time.sleep(100)
