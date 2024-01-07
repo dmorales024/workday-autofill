@@ -15,7 +15,7 @@ driver = webdriver.Chrome()
 
 # Clear browsing data
 # driver.execute_script("window.localStorage.clear();")
-driver.get("https://boeing.wd1.myworkdayjobs.com/en-US/EXTERNAL_CAREERS/job/USA---Herndon-VA/Front-End-UI-Software-Developer--Associate-Experienced-_00000407669-2/apply/applyManually")
+driver.get("https://spgi.wd5.myworkdayjobs.com/en-US/SPGI_Careers/job/Colorado-US/Engineer-I--Software-Development_294330/apply/applyManually?&utm_source=indeed")
 driver.delete_all_cookies()
 
 
@@ -110,12 +110,16 @@ def addEducation(schoolInfo):
     i = 1
     typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['schoolName'])
     input_index += 1
-    while (driver.find_element(By.XPATH, f'(//*[@class="css-12zup1l"])[1]').text.find('Bachelor') == -1) :
+    while (driver.find_element(By.XPATH, f'(//*[@class="css-12zup1l"])[1]').text.lower().find('bachelor') == -1) :
         selectFromDropdown(f'(//*[@class="css-12zup1l"])[1]', 1)
         time.sleep(0.5)
 
 
-    specialInputBox('(//*[@placeholder="Search"])', 1, schoolInfo['fieldOfStudy'])
+    # specialInputBox('(//*[@placeholder="Search"])', 1, schoolInfo['fieldOfStudy'])
+    actions = ActionChains(driver)
+    typeIntoBox(f'(//*[@placeholder="Search"])', schoolInfo['fieldOfStudy'])
+    actions.send_keys(Keys.ENTER)
+    actions.perform()
     typeIntoBox(f'(//input[@class="css-ilrio6"])[{input_index}]', schoolInfo['GPA'])
     typeIntoBox(f'(//input[@class="css-72im0m"])[{39}]', schoolInfo['startYear'])
     typeIntoBox(f'(//input[@class="css-72im0m"])[{40}]', schoolInfo['endYear'])
@@ -186,6 +190,13 @@ file_name = "RESUME-dmorales024.pdf"
 upload_file = os.path.abspath(os.path.join(os.path.dirname(__file__), file_name))
 file_input = driver.find_element(By.CSS_SELECTOR, "input[type='file']")
 file_input.send_keys(upload_file)
+
+addWebsiteButton = driver.find_element(By.XPATH, '//*[@aria-label="Add Websites"]')
+driver.execute_script("arguments[0].scrollIntoView({behavior: 'auto', block: 'center', inline: 'nearest'});", addWebsiteButton)
+addWebsiteButton.click()
+time.sleep(0.5)
+typeIntoBox(f'(//input[@class="css-ilrio6"])[{36}]', 'https://github.com/dmorales024')
+
 
 nextButton = driver.find_element(By.XPATH, '//*[@id="mainContent"]/div/div[5]/div/ul/div[3]/div/div/button')
 nextButton.click()
